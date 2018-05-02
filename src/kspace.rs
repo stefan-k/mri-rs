@@ -7,10 +7,18 @@
 
 //! k-Space
 
-pub enum KSpaceSample {
-    KS1D(f64),
-    KS2D(f64, f64),
-    KS3D(f64, f64, f64),
-}
+type KChannel = Vec<f64>;
 
-pub struct KSpace(Vec<KSpaceSample>);
+pub struct KSpace(Vec<KChannel>);
+
+impl KSpace {
+    pub fn new() -> Self {
+        KSpace(vec![])
+    }
+
+    pub fn add_channel(&mut self, ch: KChannel) -> &mut Self {
+        // todo: check dimensions
+        self.0.push(ch);
+        self
+    }
+}
