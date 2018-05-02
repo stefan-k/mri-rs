@@ -7,24 +7,24 @@
 
 //! MRI
 
-enum KSpaceSample {
-    KS1D(f64),
-    KS2D(f64, f64),
-    KS3D(f64, f64, f64),
-}
+mod encodingfield;
+mod kspace;
+mod rf;
 
-struct EncodingField {
-    field: Vec<f64>,
-}
-
-struct RFSensitivity {
-    sens: Vec<(f64, f64)>,
-}
+use encodingfield::EncodingField;
+use kspace::KSpace;
+use rf::RFSensitivity;
 
 pub struct EncodingMatrix {
-    k: Vec<KSpaceSample>,
+    k: KSpace,
     psi: Vec<EncodingField>,
     rf: Vec<RFSensitivity>,
+}
+
+impl EncodingMatrix {
+    pub fn new(k: KSpace, psi: Vec<EncodingField>, rf: Vec<RFSensitivity>) -> Self {
+        EncodingMatrix { k, psi, rf }
+    }
 }
 
 // #[cfg(test)]
