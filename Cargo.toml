@@ -17,3 +17,10 @@ exclude = [
 ]
 
 [dependencies]
+clippy = {version = "*", optional = true}
+
+[features]
+default = []
+
+[badges]
+travis-ci = { repository = "stefan-k/mri-rs", branch = "master" }
