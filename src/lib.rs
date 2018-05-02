@@ -7,10 +7,30 @@
 
 //! MRI
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
+enum KSpaceSample {
+    KS1D(f64),
+    KS2D(f64, f64),
+    KS3D(f64, f64, f64),
 }
+
+struct EncodingField {
+    field: Vec<f64>,
+}
+
+struct RFSensitivity {
+    sens: Vec<(f64, f64)>,
+}
+
+pub struct EncodingMatrix {
+    k: Vec<KSpaceSample>,
+    psi: Vec<EncodingField>,
+    rf: Vec<RFSensitivity>,
+}
+
+// #[cfg(test)]
+// mod tests {
+//     #[test]
+//     fn it_works() {
+//         assert_eq!(2 + 2, 4);
+//     }
+// }
