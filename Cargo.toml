@@ -2,5 +2,18 @@
 name = "mri"
 version = "0.0.0"
 authors = ["Stefan Kroboth <stefan.kroboth@gmail.com>"]
+license = "MIT OR Apache-2.0"
+description = "WIP"
+documentation = "https://stefan-k.github.io/mri-rs/mri/"
+homepage = "https://github.com/stefan-k/mri-rs"
+repository = "https://github.com/stefan-k/mri-rs"
+readme = "README.md"
+keywords = ["magnetic resonance imaging", "mri", "science"]
+categories = ["science"]
+#license-file = "LICENSE-APACHE"
+exclude = [ 
+	".travis.yml",
+	"push_docs",
+]
 
 [dependencies]
