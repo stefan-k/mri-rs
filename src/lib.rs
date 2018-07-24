@@ -19,13 +19,18 @@ use encodingfield::EncodingField;
 use kspace::KSpace;
 use rf::RFSensitivity;
 
+/// todo
 pub struct EncodingMatrix {
+    /// kspace
     k: KSpace,
+    /// vector of encoding fields
     psi: Vec<EncodingField>,
+    //// rf sensitivity maps
     rf: Vec<RFSensitivity>,
 }
 
 impl EncodingMatrix {
+    /// todo
     pub fn new(k: KSpace, psi: Vec<EncodingField>, rf: Vec<RFSensitivity>) -> Self {
         EncodingMatrix { k, psi, rf }
     }

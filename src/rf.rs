@@ -7,8 +7,27 @@
 
 //! MRI
 
+/// todo
+pub struct RFSensitivityArray {
+    /// todo
+    pub array: Vec<RFSensitivity>,
+}
+
+impl RFSensitivityArray {
+    pub fn new() -> Self {
+        RFSensitivityArray { array: vec![] }
+    }
+
+    pub fn push(&mut self, rf: RFSensitivity) -> &mut Self {
+        self.array.push(rf);
+        self
+    }
+}
+
+/// todo
 pub struct RFSensitivity {
-    sens: Vec<(f64, f64)>,
+    /// todo
+    pub sens: Vec<(f64, f64)>,
 }
 
 impl RFSensitivity {

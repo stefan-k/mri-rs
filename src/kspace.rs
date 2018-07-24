@@ -7,18 +7,39 @@
 
 //! k-Space
 
-type KChannel = Vec<f64>;
+type KSample = Vec<f64>;
 
-pub struct KSpace(Vec<KChannel>);
+pub struct KSpace {
+    kspace: Vec<KSample>,
+    num_channels: usize,
+}
 
 impl KSpace {
     pub fn new() -> Self {
-        KSpace(vec![])
+        KSpace {
+            kspace: vec![],
+            num_channels: 0,
+        }
     }
 
-    pub fn add_channel(&mut self, ch: KChannel) -> &mut Self {
-        // todo: check dimensions
-        self.0.push(ch);
+    pub fn add_sample(&mut self, sample: KSample) -> &mut Self {
+        if self.num_channels == 0 {
+            self.num_channels = sample.len();
+        } else if self.num_channels != sample.len() {
+            panic!("Wrong number of samples");
+        }
+
+        self.kspace.push(sample);
+        self
+    }
+
+    pub fn add_samples(&mut self, samples: Vec<KSample>) -> &mut Self {
+        samples
+            .into_iter()
+            .map(|sample| {
+                self.add_sample(sample);
+            })
+            .count();
         self
     }
 }

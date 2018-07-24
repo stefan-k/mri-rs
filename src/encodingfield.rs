@@ -7,16 +7,55 @@
 
 //! Encoding fields
 
+/// spatial dimensions
+pub enum SpatialDims<T> {
+    OneD(T),
+    TwoD(T, T),
+    ThreeD(T, T, T),
+}
+
+/// todo
 pub struct EncodingField {
-    field: Vec<f64>,
+    /// actual field
+    pub field: Vec<f64>,
+    /// dimensions
+    pub dimensions: SpatialDims<usize>,
 }
 
 impl EncodingField {
-    pub fn linear_x(nx: usize, ny: usize) -> Self {
-        unimplemented!()
+    pub fn linear_x(_fov: SpatialDims<f64>, dimensions: SpatialDims<usize>) -> Self {
+        let mut field: Vec<f64>;
+        match dimensions {
+            SpatialDims::OneD(nx) => {
+                field = Vec::with_capacity(nx);
+                for x in 0..nx {
+                    // todo
+                    field.push(x as f64);
+                }
+            }
+            SpatialDims::TwoD(nx, ny) => {
+                field = Vec::with_capacity(nx * ny);
+            }
+            SpatialDims::ThreeD(nx, ny, nz) => {
+                field = Vec::with_capacity(nx * ny * nz);
+            }
+        }
+        EncodingField { field, dimensions }
     }
 
-    pub fn linear_y(nx: usize, ny: usize) -> Self {
-        unimplemented!()
+    pub fn linear_y(_fov: Vec<f64>, dimensions: SpatialDims<usize>) -> Self {
+        let mut field: Vec<f64>;
+        match dimensions {
+            SpatialDims::OneD(nx) => {
+                field = Vec::with_capacity(nx);
+            }
+            SpatialDims::TwoD(nx, ny) => {
+                field = Vec::with_capacity(nx * ny);
+            }
+            SpatialDims::ThreeD(nx, ny, nz) => {
+                field = Vec::with_capacity(nx * ny * nz);
+            }
+        }
+        EncodingField { field, dimensions }
     }
 }
