@@ -57,6 +57,7 @@ impl EncodingField {
             }
             _ => panic!("wrong"),
         }
+
         EncodingField {
             field,
             dimensions,
@@ -92,6 +93,37 @@ impl EncodingField {
             }
             _ => panic!("wrong"),
         }
+
+        EncodingField {
+            field,
+            dimensions,
+            fov,
+        }
+    }
+
+    pub fn linear_z(fov: SpatialDims<f64>, dimensions: SpatialDims<usize>) -> Self {
+        let mut field: Vec<f64>;
+        match (&dimensions, &fov) {
+            (&SpatialDims::OneD(_), &SpatialDims::OneD(_)) => {
+                panic!("No z gradient in 1D problems");
+            }
+            (&SpatialDims::TwoD(_, _), &SpatialDims::TwoD(_, _)) => {
+                panic!("No z gradient in 2D problems");
+            }
+            (&SpatialDims::ThreeD(nx, ny, nz), &SpatialDims::ThreeD(_, _, fov_z)) => {
+                field = Vec::with_capacity(nx * ny * nz);
+                let step = 1.0 - 1.0 / (ny as f64);
+                for z in 0..nz {
+                    for _ in 0..ny {
+                        for _ in 0..nx {
+                            field.push(fov_z * (-0.5 + (z as f64) * step));
+                        }
+                    }
+                }
+            }
+            _ => panic!("wrong"),
+        }
+
         EncodingField {
             field,
             dimensions,
