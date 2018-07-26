@@ -20,30 +20,51 @@ pub struct EncodingField {
     pub field: Vec<f64>,
     /// dimensions
     pub dimensions: SpatialDims<usize>,
+    /// field of view
+    pub fov: SpatialDims<f64>,
 }
 
 impl EncodingField {
-    pub fn linear_x(_fov: SpatialDims<f64>, dimensions: SpatialDims<usize>) -> Self {
+    pub fn linear_x(fov: SpatialDims<f64>, dimensions: SpatialDims<usize>) -> Self {
         let mut field: Vec<f64>;
-        match dimensions {
-            SpatialDims::OneD(nx) => {
+        match (&dimensions, &fov) {
+            (&SpatialDims::OneD(nx), &SpatialDims::OneD(fov_x)) => {
                 field = Vec::with_capacity(nx);
+                let step = 1.0 - 1.0 / (nx as f64);
                 for x in 0..nx {
-                    // todo
-                    field.push(x as f64);
+                    field.push(fov_x * (-0.5 + (x as f64) * step));
                 }
             }
-            SpatialDims::TwoD(nx, ny) => {
+            (&SpatialDims::TwoD(nx, ny), &SpatialDims::TwoD(fov_x, fov_y)) => {
                 field = Vec::with_capacity(nx * ny);
+                let step = 1.0 - 1.0 / (nx as f64);
+                for _ in 0..ny {
+                    for x in 0..nx {
+                        field.push(fov_x * (-0.5 + (x as f64) * step));
+                    }
+                }
             }
-            SpatialDims::ThreeD(nx, ny, nz) => {
+            (&SpatialDims::ThreeD(nx, ny, nz), &SpatialDims::ThreeD(fov_x, fov_y, fov_z)) => {
                 field = Vec::with_capacity(nx * ny * nz);
+                let step = 1.0 - 1.0 / (nx as f64);
+                for _ in 0..nz {
+                    for _ in 0..ny {
+                        for x in 0..nx {
+                            field.push(fov_x * (-0.5 + (x as f64) * step));
+                        }
+                    }
+                }
             }
+            _ => panic!("wrong"),
         }
-        EncodingField { field, dimensions }
+        EncodingField {
+            field,
+            dimensions,
+            fov,
+        }
     }
 
-    pub fn linear_y(_fov: Vec<f64>, dimensions: SpatialDims<usize>) -> Self {
+    pub fn linear_y(fov: SpatialDims<f64>, dimensions: SpatialDims<usize>) -> Self {
         let mut field: Vec<f64>;
         match dimensions {
             SpatialDims::OneD(nx) => {
@@ -56,6 +77,10 @@ impl EncodingField {
                 field = Vec::with_capacity(nx * ny * nz);
             }
         }
-        EncodingField { field, dimensions }
+        EncodingField {
+            field,
+            dimensions,
+            fov,
+        }
     }
 }
