@@ -31,7 +31,7 @@ pub struct RFSensitivity {
 }
 
 impl RFSensitivity {
-    pub fn new() -> Self {
-        RFSensitivity { sens: vec![] }
+    pub fn new(sens: Vec<(f64, f64)>) -> Self {
+        RFSensitivity { sens }
     }
 }
