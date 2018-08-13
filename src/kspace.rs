@@ -51,9 +51,10 @@ impl KSpace {
         self
     }
 
+    /// Create a Cartesian trajectory
     pub fn cartesian(fov: SpatialDims<f64>, samples: SpatialDims<usize>) -> Self {
-        let dk: Vec<f64> = fov.clone().into_iter().map(|x| 1.0 / x).collect();
-        match (fov, samples) {
+        let dk = fov.invert();
+        match (dk, samples) {
             (SpatialDims::OneD(fov_x), SpatialDims::OneD(nx)) => unimplemented!(),
             (SpatialDims::TwoD(fov_x, fov_y), SpatialDims::TwoD(nx, ny)) => unimplemented!(),
             (SpatialDims::ThreeD(fov_x, fov_y, fov_z), SpatialDims::ThreeD(nx, ny, nz)) => {

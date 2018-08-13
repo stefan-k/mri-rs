@@ -14,69 +14,12 @@
 pub mod encodingfield;
 pub mod kspace;
 pub mod rf;
+pub mod spatialdims;
 
-use encodingfield::EncodingField;
-// use kspace::KSpace;
-// use rf::RFSensitivity;
-
-/// spatial dimensions
-#[derive(Debug, Clone)]
-pub enum SpatialDims<T> {
-    /// One dimension
-    OneD(T),
-    /// Two dimensions
-    TwoD(T, T),
-    /// Three dimensions
-    ThreeD(T, T, T),
-}
-
-/// Iterator thingy
-pub struct SpatialDimsIntoIterator<T> {
-    dims: SpatialDims<T>,
-    index: usize,
-}
-
-impl<T: std::clone::Clone> IntoIterator for SpatialDims<T> {
-    type Item = T;
-    type IntoIter = SpatialDimsIntoIterator<T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        SpatialDimsIntoIterator {
-            dims: self,
-            index: 0,
-        }
-    }
-}
-
-impl<T: std::clone::Clone> Iterator for SpatialDimsIntoIterator<T> {
-    type Item = T;
-
-    fn next(&mut self) -> Option<T> {
-        let idx = self.index;
-        let dims = self.dims.clone();
-        self.index += 1;
-        if idx == 0 {
-            match dims {
-                SpatialDims::OneD(x) => Some(x),
-                SpatialDims::TwoD(x, _) => Some(x),
-                SpatialDims::ThreeD(x, _, _) => Some(x),
-            }
-        } else if idx == 1 {
-            match dims {
-                SpatialDims::TwoD(_, y) => Some(y),
-                SpatialDims::ThreeD(_, y, _) => Some(y),
-                _ => None,
-            }
-        } else if idx == 2 {
-            match dims {
-                SpatialDims::ThreeD(_, _, z) => Some(z),
-                _ => None,
-            }
-        } else {
-            None
-        }
-    }
-}
+pub use encodingfield::EncodingField;
+pub use kspace::KSpace;
+pub use rf::RFSensitivity;
+pub use spatialdims::SpatialDims;
 
 // /// todo
 // pub struct EncodingMatrix {
