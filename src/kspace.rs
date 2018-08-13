@@ -9,12 +9,16 @@
 
 type KSample = Vec<f64>;
 
+/// Representation of a k-space trajectory
 pub struct KSpace {
+    /// A vector of k-space samples
     kspace: Vec<KSample>,
+    /// Number of encoding channels
     num_channels: usize,
 }
 
 impl KSpace {
+    /// Constructor
     pub fn new() -> Self {
         KSpace {
             kspace: vec![],
@@ -22,6 +26,7 @@ impl KSpace {
         }
     }
 
+    /// Add a single k-space sample point to an existing trajectory
     pub fn add_sample(&mut self, sample: KSample) -> &mut Self {
         if self.num_channels == 0 {
             self.num_channels = sample.len();
@@ -33,13 +38,13 @@ impl KSpace {
         self
     }
 
+    /// Add several k-space sample points to an existing trajectory
     pub fn add_samples(&mut self, samples: Vec<KSample>) -> &mut Self {
         samples
             .into_iter()
             .map(|sample| {
                 self.add_sample(sample);
-            })
-            .count();
+            }).count();
         self
     }
 }
