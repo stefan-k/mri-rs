@@ -12,7 +12,6 @@
 #![warn(missing_docs)]
 
 pub mod encodingfield;
-pub mod gmat;
 pub mod kspace;
 pub mod rf;
 
