@@ -87,7 +87,7 @@ impl KSpace {
                     for ii in 0..nx {
                         k.push(vec![
                             -nx2 * dkx + (ii as f64) * dkx,
-                            -ny2 + dkx + (jj as f64) * dky,
+                            -ny2 * dky + (jj as f64) * dky,
                         ]);
                     }
                 }
@@ -117,8 +117,8 @@ impl KSpace {
                         for ii in 0..nx {
                             k.push(vec![
                                 -nx2 * dkx + (ii as f64) * dkx,
-                                -ny2 + dky + (jj as f64) * dky,
-                                -nz2 + dkz + (kk as f64) * dkz,
+                                -ny2 * dky + (jj as f64) * dky,
+                                -nz2 * dkz + (kk as f64) * dkz,
                             ]);
                         }
                     }
