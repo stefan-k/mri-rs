@@ -176,10 +176,12 @@ impl EncodingFieldDiscrete {
         }
     }
 
+    /// Return the dimensions
     pub fn dimensions(&self) -> SpatialDims<usize> {
         self.dimensions.clone()
     }
 
+    /// Return the FOV
     pub fn fov(&self) -> SpatialDims<f64> {
         self.fov.clone()
     }
