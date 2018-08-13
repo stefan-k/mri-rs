@@ -7,6 +7,9 @@
 
 //! k-Space
 
+use SpatialDims;
+// use SpatialDimsIntoIterator;
+
 type KSample = Vec<f64>;
 
 /// Representation of a k-space trajectory
@@ -46,5 +49,17 @@ impl KSpace {
                 self.add_sample(sample);
             }).count();
         self
+    }
+
+    pub fn cartesian(fov: SpatialDims<f64>, samples: SpatialDims<usize>) -> Self {
+        let dk: Vec<f64> = fov.clone().into_iter().map(|x| 1.0 / x).collect();
+        match (fov, samples) {
+            (SpatialDims::OneD(fov_x), SpatialDims::OneD(nx)) => unimplemented!(),
+            (SpatialDims::TwoD(fov_x, fov_y), SpatialDims::TwoD(nx, ny)) => unimplemented!(),
+            (SpatialDims::ThreeD(fov_x, fov_y, fov_z), SpatialDims::ThreeD(nx, ny, nz)) => {
+                unimplemented!()
+            }
+            _ => unimplemented!(),
+        }
     }
 }

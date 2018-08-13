@@ -9,14 +9,6 @@ extern crate mri;
 
 use mri::encodingfield::EncodingField;
 
-fn linear_x(x: f64, _y: f64, _z: f64) -> f64 {
-    x
-}
-
-fn deriv_linear_x(_x: f64, _y: f64, _z: f64) -> (f64, f64, f64) {
-    (1.0, 0.0, 0.0)
-}
-
 fn main() {
     let linx = &|x: f64, _: f64, _: f64| x;
     let dlinx = &|_: f64, _: f64, _: f64| (1.0, 0.0, 0.0);
@@ -24,7 +16,7 @@ fn main() {
     fx.derivative(&dlinx);
 
     let liny = &|_: f64, y: f64, _: f64| y;
-    let dliny = &|_: f64, _: f64, _: f64| (1.0, 0.0, 0.0);
+    let dliny = &|_: f64, _: f64, _: f64| (0.0, 1.0, 0.0);
     let mut fy = EncodingField::new(&liny);
     fy.derivative(&dliny);
 
