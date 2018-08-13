@@ -7,7 +7,9 @@
 
 extern crate mri;
 
-use mri::encodingfield::EncodingField;
+use mri::EncodingField;
+use mri::KSpace;
+use mri::SpatialDims;
 
 fn main() {
     let linx = &|x: f64, _: f64, _: f64| x;
@@ -21,4 +23,7 @@ fn main() {
     fy.derivative(&dliny);
 
     println!("{:?}", fx.at(2.0, 0.0, 0.0));
+
+    let ks = KSpace::cartesian(SpatialDims::TwoD(2.0, 2.0), SpatialDims::TwoD(8, 8));
+    println!("{:?}", ks);
 }

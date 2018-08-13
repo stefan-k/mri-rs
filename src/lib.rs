@@ -11,6 +11,8 @@
 #![cfg_attr(feature = "clippy", plugin(clippy))]
 #![warn(missing_docs)]
 
+extern crate num;
+
 pub mod encodingfield;
 pub mod kspace;
 pub mod rf;

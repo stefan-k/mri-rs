@@ -7,12 +7,14 @@
 
 //! k-Space
 
+use num::Integer;
 use SpatialDims;
 // use SpatialDimsIntoIterator;
 
 type KSample = Vec<f64>;
 
 /// Representation of a k-space trajectory
+#[derive(Debug)]
 pub struct KSpace {
     /// A vector of k-space samples
     kspace: Vec<KSample>,
@@ -54,14 +56,79 @@ impl KSpace {
     /// Create a Cartesian trajectory
     pub fn cartesian(fov: SpatialDims<f64>, samples: SpatialDims<usize>) -> Self {
         let dk = fov.invert();
-        let k: Vec<KSample> = Vec::with_capacity(samples.product());
+        let mut k: Vec<KSample> = Vec::with_capacity(samples.product());
         match (dk, samples) {
-            (SpatialDims::OneD(dkx), SpatialDims::OneD(nx)) => unimplemented!(),
-            (SpatialDims::TwoD(dkx, dky), SpatialDims::TwoD(nx, ny)) => unimplemented!(),
-            (SpatialDims::ThreeD(dkx, dky, dkz), SpatialDims::ThreeD(nx, ny, nz)) => {
-                unimplemented!()
+            (SpatialDims::OneD(dkx), SpatialDims::OneD(nx)) => {
+                let nx2 = if nx.is_even() {
+                    (nx as f64) / 2.0
+                } else {
+                    (nx - 1) as f64 / 2.0
+                };
+                for ii in 0..nx {
+                    k.push(vec![-nx2 * dkx + (ii as f64) * dkx]);
+                }
+                KSpace {
+                    kspace: k,
+                    num_channels: 1,
+                }
             }
-            _ => unimplemented!(),
+            (SpatialDims::TwoD(dkx, dky), SpatialDims::TwoD(nx, ny)) => {
+                let nx2 = if nx.is_even() {
+                    (nx as f64) / 2.0
+                } else {
+                    (nx - 1) as f64 / 2.0
+                };
+                let ny2 = if ny.is_even() {
+                    (ny as f64) / 2.0
+                } else {
+                    (ny - 1) as f64 / 2.0
+                };
+                for jj in 0..ny {
+                    for ii in 0..nx {
+                        k.push(vec![
+                            -nx2 * dkx + (ii as f64) * dkx,
+                            -ny2 + dkx + (jj as f64) * dky,
+                        ]);
+                    }
+                }
+                KSpace {
+                    kspace: k,
+                    num_channels: 2,
+                }
+            }
+            (SpatialDims::ThreeD(dkx, dky, dkz), SpatialDims::ThreeD(nx, ny, nz)) => {
+                let nx2 = if nx.is_even() {
+                    (nx as f64) / 2.0
+                } else {
+                    (nx - 1) as f64 / 2.0
+                };
+                let ny2 = if ny.is_even() {
+                    (ny as f64) / 2.0
+                } else {
+                    (ny - 1) as f64 / 2.0
+                };
+                let nz2 = if nz.is_even() {
+                    (nz as f64) / 2.0
+                } else {
+                    (nz - 1) as f64 / 2.0
+                };
+                for kk in 0..nz {
+                    for jj in 0..ny {
+                        for ii in 0..nx {
+                            k.push(vec![
+                                -nx2 * dkx + (ii as f64) * dkx,
+                                -ny2 + dky + (jj as f64) * dky,
+                                -nz2 + dkz + (kk as f64) * dkz,
+                            ]);
+                        }
+                    }
+                }
+                KSpace {
+                    kspace: k,
+                    num_channels: 3,
+                }
+            }
+            _ => panic!("Wrong combination of things."),
         }
     }
 }

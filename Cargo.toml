@@ -18,6 +18,7 @@ exclude = [
 
 [dependencies]
 clippy = {version = "*", optional = true}
+num = "*"
 
 [features]
 default = []
