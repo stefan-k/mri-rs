@@ -31,6 +31,21 @@ impl SpatialDims<f64> {
     }
 }
 
+impl<T> SpatialDims<T>
+where
+    T: std::ops::Mul<Output = T> + std::clone::Clone,
+{
+    /// compute the product
+    pub fn product(&self) -> T {
+        // wtf
+        match *self {
+            SpatialDims::OneD(ref x) => x.clone(),
+            SpatialDims::TwoD(ref x, ref y) => x.clone() * y.clone(),
+            SpatialDims::ThreeD(ref x, ref y, ref z) => x.clone() * y.clone() * z.clone(),
+        }
+    }
+}
+
 /// Iterator thingy
 pub struct SpatialDimsIntoIterator<T> {
     dims: SpatialDims<T>,

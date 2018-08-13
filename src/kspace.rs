@@ -54,10 +54,11 @@ impl KSpace {
     /// Create a Cartesian trajectory
     pub fn cartesian(fov: SpatialDims<f64>, samples: SpatialDims<usize>) -> Self {
         let dk = fov.invert();
+        let k: Vec<KSample> = Vec::with_capacity(samples.product());
         match (dk, samples) {
-            (SpatialDims::OneD(fov_x), SpatialDims::OneD(nx)) => unimplemented!(),
-            (SpatialDims::TwoD(fov_x, fov_y), SpatialDims::TwoD(nx, ny)) => unimplemented!(),
-            (SpatialDims::ThreeD(fov_x, fov_y, fov_z), SpatialDims::ThreeD(nx, ny, nz)) => {
+            (SpatialDims::OneD(dkx), SpatialDims::OneD(nx)) => unimplemented!(),
+            (SpatialDims::TwoD(dkx, dky), SpatialDims::TwoD(nx, ny)) => unimplemented!(),
+            (SpatialDims::ThreeD(dkx, dky, dkz), SpatialDims::ThreeD(nx, ny, nz)) => {
                 unimplemented!()
             }
             _ => unimplemented!(),
