@@ -14,10 +14,12 @@ pub struct RFSensitivityArray {
 }
 
 impl RFSensitivityArray {
+    /// Constructor
     pub fn new() -> Self {
         RFSensitivityArray { array: vec![] }
     }
 
+    /// Push new RF sensitivity
     pub fn push(&mut self, rf: RFSensitivity) -> &mut Self {
         self.array.push(rf);
         self
@@ -31,6 +33,7 @@ pub struct RFSensitivity {
 }
 
 impl RFSensitivity {
+    /// Constructor
     pub fn new(sens: Vec<(f64, f64)>) -> Self {
         RFSensitivity { sens }
     }
