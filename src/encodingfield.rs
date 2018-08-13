@@ -9,18 +9,64 @@
 
 use SpatialDims;
 
+/// Different kinds of encoding field derivatives
+enum EncodingFieldDerivative<'a> {
+    FiniteDiff,
+    Func(&'a Fn(f64, f64, f64) -> (f64, f64, f64)),
+}
+
+/// This is a field that will be computed on the fly
+pub struct EncodingField<'a> {
+    /// Field
+    field: &'a Fn(f64, f64, f64) -> f64,
+    /// derivative
+    derivative: EncodingFieldDerivative<'a>,
+}
+
+impl<'a> EncodingField<'a> {
+    /// Constructor
+    pub fn new(field: &'a Fn(f64, f64, f64) -> f64) -> Self {
+        EncodingField {
+            field,
+            derivative: EncodingFieldDerivative::FiniteDiff,
+        }
+    }
+
+    /// Set derivative of the field
+    pub fn derivative(
+        &mut self,
+        derivative: &'a Fn(f64, f64, f64) -> (f64, f64, f64),
+    ) -> &mut Self {
+        self.derivative = EncodingFieldDerivative::Func(derivative);
+        self
+    }
+
+    /// Get value of field at position (x, y, z)
+    pub fn at(&self, x: f64, y: f64, z: f64) -> f64 {
+        (*self.field)(x, y, z)
+    }
+
+    /// Get the derivative at a certain point
+    pub fn deriv_at(&self, x: f64, y: f64, z: f64) -> (f64, f64, f64) {
+        match self.derivative {
+            EncodingFieldDerivative::FiniteDiff => unimplemented!(),
+            EncodingFieldDerivative::Func(f) => f(x, y, z),
+        }
+    }
+}
+
 /// todo
 #[derive(Debug)]
-pub struct EncodingField {
+pub struct EncodingFieldDiscrete {
     /// actual field
     pub field: Vec<f64>,
     /// dimensions
-    pub dimensions: SpatialDims<usize>,
+    dimensions: SpatialDims<usize>,
     /// field of view
-    pub fov: SpatialDims<f64>,
+    fov: SpatialDims<f64>,
 }
 
-impl EncodingField {
+impl EncodingFieldDiscrete {
     /// Create a linear field in x
     pub fn linear_x(fov: SpatialDims<f64>, dimensions: SpatialDims<usize>) -> Self {
         let mut field: Vec<f64>;
@@ -55,7 +101,7 @@ impl EncodingField {
             _ => panic!("wrong"),
         }
 
-        EncodingField {
+        EncodingFieldDiscrete {
             field,
             dimensions,
             fov,
@@ -92,7 +138,7 @@ impl EncodingField {
             _ => panic!("wrong"),
         }
 
-        EncodingField {
+        EncodingFieldDiscrete {
             field,
             dimensions,
             fov,
@@ -123,10 +169,18 @@ impl EncodingField {
             _ => panic!("wrong"),
         }
 
-        EncodingField {
+        EncodingFieldDiscrete {
             field,
             dimensions,
             fov,
         }
+    }
+
+    pub fn dimensions(&self) -> SpatialDims<usize> {
+        self.dimensions.clone()
+    }
+
+    pub fn fov(&self) -> SpatialDims<f64> {
+        self.fov.clone()
     }
 }

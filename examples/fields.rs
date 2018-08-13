@@ -7,7 +7,7 @@
 
 extern crate mri;
 
-use mri::encodingfield::EncodingField;
+use mri::encodingfield::EncodingFieldDiscrete;
 use mri::SpatialDims;
 
 fn main() {
@@ -15,6 +15,6 @@ fn main() {
     let dims = SpatialDims::OneD(8);
     // let fov = SpatialDims::TwoD(1.0, 1.0);
     // let dims = SpatialDims::TwoD(8, 8);
-    let f = EncodingField::linear_x(fov, dims);
+    let f = EncodingFieldDiscrete::linear_x(fov, dims);
     println!("{:?}", f);
 }

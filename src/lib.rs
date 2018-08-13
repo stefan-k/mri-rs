@@ -12,15 +12,16 @@
 #![warn(missing_docs)]
 
 pub mod encodingfield;
+pub mod gmat;
 pub mod kspace;
 pub mod rf;
 
 use encodingfield::EncodingField;
-use kspace::KSpace;
-use rf::RFSensitivity;
+// use kspace::KSpace;
+// use rf::RFSensitivity;
 
 /// spatial dimensions
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum SpatialDims<T> {
     /// One dimension
     OneD(T),
@@ -30,22 +31,22 @@ pub enum SpatialDims<T> {
     ThreeD(T, T, T),
 }
 
-/// todo
-pub struct EncodingMatrix {
-    /// kspace
-    k: KSpace,
-    /// vector of encoding fields
-    psi: Vec<EncodingField>,
-    //// rf sensitivity maps
-    rf: Vec<RFSensitivity>,
-}
+// /// todo
+// pub struct EncodingMatrix {
+//     /// kspace
+//     k: KSpace,
+//     /// vector of encoding fields
+//     psi: Vec<EncodingField>,
+//     //// rf sensitivity maps
+//     rf: Vec<RFSensitivity>,
+// }
 
-impl EncodingMatrix {
-    /// todo
-    pub fn new(k: KSpace, psi: Vec<EncodingField>, rf: Vec<RFSensitivity>) -> Self {
-        EncodingMatrix { k, psi, rf }
-    }
-}
+// impl EncodingMatrix {
+//     /// todo
+//     pub fn new(k: KSpace, psi: Vec<EncodingField>, rf: Vec<RFSensitivity>) -> Self {
+//         EncodingMatrix { k, psi, rf }
+//     }
+// }
 
 // #[cfg(test)]
 // mod tests {
