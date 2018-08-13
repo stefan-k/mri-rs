@@ -7,14 +7,10 @@
 
 //! Encoding fields
 
-/// spatial dimensions
-pub enum SpatialDims<T> {
-    OneD(T),
-    TwoD(T, T),
-    ThreeD(T, T, T),
-}
+use SpatialDims;
 
 /// todo
+#[derive(Debug)]
 pub struct EncodingField {
     /// actual field
     pub field: Vec<f64>,
@@ -25,19 +21,20 @@ pub struct EncodingField {
 }
 
 impl EncodingField {
+    /// Create a linear field in x
     pub fn linear_x(fov: SpatialDims<f64>, dimensions: SpatialDims<usize>) -> Self {
         let mut field: Vec<f64>;
         match (&dimensions, &fov) {
             (&SpatialDims::OneD(nx), &SpatialDims::OneD(fov_x)) => {
                 field = Vec::with_capacity(nx);
-                let step = 1.0 - 1.0 / (nx as f64);
+                let step = 1.0 / (nx as f64);
                 for x in 0..nx {
                     field.push(fov_x * (-0.5 + (x as f64) * step));
                 }
             }
             (&SpatialDims::TwoD(nx, ny), &SpatialDims::TwoD(fov_x, _)) => {
                 field = Vec::with_capacity(nx * ny);
-                let step = 1.0 - 1.0 / (nx as f64);
+                let step = 1.0 / (nx as f64);
                 for _ in 0..ny {
                     for x in 0..nx {
                         field.push(fov_x * (-0.5 + (x as f64) * step));
@@ -46,7 +43,7 @@ impl EncodingField {
             }
             (&SpatialDims::ThreeD(nx, ny, nz), &SpatialDims::ThreeD(fov_x, _, _)) => {
                 field = Vec::with_capacity(nx * ny * nz);
-                let step = 1.0 - 1.0 / (nx as f64);
+                let step = 1.0 / (nx as f64);
                 for _ in 0..nz {
                     for _ in 0..ny {
                         for x in 0..nx {
@@ -65,6 +62,7 @@ impl EncodingField {
         }
     }
 
+    /// Create a linear field in y
     pub fn linear_y(fov: SpatialDims<f64>, dimensions: SpatialDims<usize>) -> Self {
         let mut field: Vec<f64>;
         match (&dimensions, &fov) {
@@ -73,7 +71,7 @@ impl EncodingField {
             }
             (&SpatialDims::TwoD(nx, ny), &SpatialDims::TwoD(_, fov_y)) => {
                 field = Vec::with_capacity(nx * ny);
-                let step = 1.0 - 1.0 / (ny as f64);
+                let step = 1.0 / (ny as f64);
                 for y in 0..ny {
                     for _ in 0..nx {
                         field.push(fov_y * (-0.5 + (y as f64) * step));
@@ -82,7 +80,7 @@ impl EncodingField {
             }
             (&SpatialDims::ThreeD(nx, ny, nz), &SpatialDims::ThreeD(_, fov_y, _)) => {
                 field = Vec::with_capacity(nx * ny * nz);
-                let step = 1.0 - 1.0 / (ny as f64);
+                let step = 1.0 / (ny as f64);
                 for _ in 0..nz {
                     for y in 0..ny {
                         for _ in 0..nx {
@@ -101,6 +99,7 @@ impl EncodingField {
         }
     }
 
+    /// Create a linear field in z
     pub fn linear_z(fov: SpatialDims<f64>, dimensions: SpatialDims<usize>) -> Self {
         let mut field: Vec<f64>;
         match (&dimensions, &fov) {
@@ -112,7 +111,7 @@ impl EncodingField {
             }
             (&SpatialDims::ThreeD(nx, ny, nz), &SpatialDims::ThreeD(_, _, fov_z)) => {
                 field = Vec::with_capacity(nx * ny * nz);
-                let step = 1.0 - 1.0 / (ny as f64);
+                let step = 1.0 / (ny as f64);
                 for z in 0..nz {
                     for _ in 0..ny {
                         for _ in 0..nx {

@@ -11,13 +11,24 @@
 #![cfg_attr(feature = "clippy", plugin(clippy))]
 #![warn(missing_docs)]
 
-mod encodingfield;
-mod kspace;
-mod rf;
+pub mod encodingfield;
+pub mod kspace;
+pub mod rf;
 
 use encodingfield::EncodingField;
 use kspace::KSpace;
 use rf::RFSensitivity;
+
+/// spatial dimensions
+#[derive(Debug)]
+pub enum SpatialDims<T> {
+    /// One dimension
+    OneD(T),
+    /// Two dimensions
+    TwoD(T, T),
+    /// Three dimensions
+    ThreeD(T, T, T),
+}
 
 /// todo
 pub struct EncodingMatrix {
