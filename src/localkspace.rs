@@ -30,7 +30,7 @@ impl<'a> LocalKSpace<'a> {
     }
 
     /// return local k space a certain position
-    pub fn at(&self, pos: SpatialDims<f64>) -> KSpace {
+    pub fn at(&self, pos: &SpatialDims<f64>) -> KSpace {
         let derivs: Vec<SpatialDims<f64>> = self.fields.iter().map(|x| x.deriv_at(&pos)).collect();
         let mut grad: Vec<Vec<f64>> = Vec::with_capacity(pos.len());
         grad.push(derivs.iter().map(|x| x.x().unwrap()).collect());

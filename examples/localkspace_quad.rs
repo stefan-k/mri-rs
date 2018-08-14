@@ -34,7 +34,7 @@ fn main() {
     println!("{:?}", ks);
 
     let lk = LocalKSpace::new(ks, vec![fa, fb]);
-    let localk = lk.at(SpatialDims::TwoD(0.1, 0.1));
+    let localk = lk.at(&SpatialDims::TwoD(0.1, 0.1));
 
     println!("{:?}", localk);
 }
