@@ -36,17 +36,17 @@ fn main() {
     let fov: f64 = 0.2;
     let nx: usize = 4;
 
-    let linx = &|pos: SpatialDims<f64>| pos.x().unwrap();
-    let dlinx = &|pos: SpatialDims<f64>| SpatialDims::TwoD(1.0, 0.0);
+    let linx = &|pos: &SpatialDims<f64>| pos.x().unwrap();
+    let dlinx = &|pos: &SpatialDims<f64>| SpatialDims::TwoD(1.0, 0.0);
     let mut fx = EncodingField::new(&linx);
     fx.derivative(&dlinx);
 
-    let liny = &|pos: SpatialDims<f64>| pos.y().unwrap();
-    let dliny = &|pos: SpatialDims<f64>| SpatialDims::TwoD(0.0, 1.0);
+    let liny = &|pos: &SpatialDims<f64>| pos.y().unwrap();
+    let dliny = &|pos: &SpatialDims<f64>| SpatialDims::TwoD(0.0, 1.0);
     let mut fy = EncodingField::new(&liny);
     fy.derivative(&dliny);
 
-    println!("{:?}", fx.at(SpatialDims::TwoD(2.0, 0.0)));
+    println!("{:?}", fx.at(&SpatialDims::TwoD(2.0, 0.0)));
 
     let ks = KSpace::cartesian(SpatialDims::TwoD(fov, fov), SpatialDims::TwoD(nx, nx));
     println!("{:?}", ks);
@@ -55,8 +55,8 @@ fn main() {
     let pos_y = -0.1;
     let pos_z = 0.0;
 
-    let diff_fx = fx.deriv_at(SpatialDims::ThreeD(pos_x, pos_y, pos_z));
-    let diff_fy = fy.deriv_at(SpatialDims::ThreeD(pos_x, pos_y, pos_z));
+    let diff_fx = fx.deriv_at(&SpatialDims::ThreeD(pos_x, pos_y, pos_z));
+    let diff_fy = fy.deriv_at(&SpatialDims::ThreeD(pos_x, pos_y, pos_z));
 
     println!("{:?} | {:?}", diff_fx, diff_fy);
 
@@ -68,4 +68,7 @@ fn main() {
     println!("{:?}", localk);
 
     let lk = LocalKSpace::new(ks, vec![fx, fy]);
+    let lokalk = lk.at(SpatialDims::TwoD(0.0, 1.0));
+
+    println!("{:?}", localk);
 }

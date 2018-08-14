@@ -26,7 +26,6 @@ impl<'a> LocalKSpace<'a> {
     pub fn new(kspace: KSpace, fields: Vec<EncodingField<'a>>) -> Self {
         assert!(kspace.num_channels() == fields.len());
         let num_channels = fields.len();
-        // let mut grads: Vec<Vec<f64>> = Vec::with_capacity(num_channels);
         LocalKSpace {
             kspace: kspace,
             fields: fields,
@@ -36,8 +35,22 @@ impl<'a> LocalKSpace<'a> {
 
     /// return local k space a certain position
     pub fn at(&self, pos: SpatialDims<f64>) -> KSpace {
-        // let grads: Vec<Vec<f64>> = Vec::with_capacity(self.num_channels);
-        let grad_x = self.fields[0].deriv_at(pos);
-        unimplemented!()
+        let derivs: Vec<SpatialDims<f64>> = self.fields.iter().map(|x| x.deriv_at(&pos)).collect();
+        let grad_x: Vec<f64> = derivs.iter().map(|x| x.x().unwrap()).collect();
+        let grad_y: Vec<f64> = derivs.iter().map(|x| x.y().unwrap()).collect();
+        let mut out = KSpace::new();
+        out.add_samples(
+            self.kspace
+                .kspace
+                .iter()
+                .map(|x| {
+                    vec![
+                        x.iter().zip(grad_x.iter()).map(|(a, b)| a * b).sum(),
+                        x.iter().zip(grad_y.iter()).map(|(a, b)| a * b).sum(),
+                        // x.iter().zip(grad_z.iter()).map(|(a, b)| a * b).sum(),
+                    ]
+                }).collect(),
+        );
+        out
     }
 }
