@@ -17,7 +17,7 @@ type KSample = Vec<f64>;
 #[derive(Debug)]
 pub struct KSpace {
     /// A vector of k-space samples
-    kspace: Vec<KSample>,
+    pub kspace: Vec<KSample>,
     /// Number of encoding channels
     num_channels: usize,
 }
@@ -51,6 +51,16 @@ impl KSpace {
                 self.add_sample(sample);
             }).count();
         self
+    }
+
+    /// Return the number of channels
+    pub fn num_channels(&self) -> usize {
+        self.num_channels
+    }
+
+    /// Return the number of k-space samples
+    pub fn num_samples(&self) -> usize {
+        self.kspace.len()
     }
 
     /// Create a Cartesian trajectory
