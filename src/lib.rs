@@ -15,11 +15,13 @@ extern crate num;
 
 pub mod encodingfield;
 pub mod kspace;
+pub mod localkspace;
 pub mod rf;
 pub mod spatialdims;
 
 pub use encodingfield::EncodingField;
 pub use kspace::KSpace;
+pub use localkspace::LocalKSpace;
 pub use rf::RFSensitivity;
 pub use spatialdims::SpatialDims;
 

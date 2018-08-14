@@ -46,6 +46,49 @@ where
     }
 }
 
+impl<T> SpatialDims<T> {
+    /// return length
+    pub fn len(&self) -> usize {
+        match *self {
+            SpatialDims::OneD(_) => 1,
+            SpatialDims::TwoD(_, _) => 2,
+            SpatialDims::ThreeD(_, _, _) => 3,
+        }
+    }
+}
+
+impl<T> SpatialDims<T>
+where
+    T: std::clone::Clone,
+{
+    /// return x
+    pub fn x(&self) -> Option<T> {
+        match *self {
+            SpatialDims::OneD(ref x) => Some(x.clone()),
+            SpatialDims::TwoD(ref x, _) => Some(x.clone()),
+            SpatialDims::ThreeD(ref x, _, _) => Some(x.clone()),
+        }
+    }
+
+    /// return y
+    pub fn y(&self) -> Option<T> {
+        match *self {
+            SpatialDims::OneD(_) => None,
+            SpatialDims::TwoD(_, ref y) => Some(y.clone()),
+            SpatialDims::ThreeD(_, ref y, _) => Some(y.clone()),
+        }
+    }
+
+    /// return z
+    pub fn z(&self) -> Option<T> {
+        match *self {
+            SpatialDims::OneD(_) => None,
+            SpatialDims::TwoD(_, _) => None,
+            SpatialDims::ThreeD(_, _, ref z) => Some(z.clone()),
+        }
+    }
+}
+
 /// Iterator thingy
 pub struct SpatialDimsIntoIterator<T> {
     dims: SpatialDims<T>,
