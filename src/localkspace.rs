@@ -17,38 +17,39 @@ pub struct LocalKSpace<'a> {
     kspace: KSpace,
     /// fields
     fields: Vec<EncodingField<'a>>,
-    /// number of channels
-    num_channels: usize,
 }
 
 impl<'a> LocalKSpace<'a> {
     /// Create new local k-space object
     pub fn new(kspace: KSpace, fields: Vec<EncodingField<'a>>) -> Self {
         assert!(kspace.num_channels() == fields.len());
-        let num_channels = fields.len();
         LocalKSpace {
             kspace: kspace,
             fields: fields,
-            num_channels: num_channels,
         }
     }
 
     /// return local k space a certain position
     pub fn at(&self, pos: SpatialDims<f64>) -> KSpace {
         let derivs: Vec<SpatialDims<f64>> = self.fields.iter().map(|x| x.deriv_at(&pos)).collect();
-        let grad_x: Vec<f64> = derivs.iter().map(|x| x.x().unwrap()).collect();
-        let grad_y: Vec<f64> = derivs.iter().map(|x| x.y().unwrap()).collect();
+        let mut grad: Vec<Vec<f64>> = Vec::with_capacity(pos.len());
+        grad.push(derivs.iter().map(|x| x.x().unwrap()).collect());
+        if pos.len() > 1 {
+            grad.push(derivs.iter().map(|x| x.y().unwrap()).collect());
+        }
+        if pos.len() > 2 {
+            grad.push(derivs.iter().map(|x| x.z().unwrap()).collect());
+        }
+
         let mut out = KSpace::new();
         out.add_samples(
             self.kspace
                 .kspace
                 .iter()
                 .map(|x| {
-                    vec![
-                        x.iter().zip(grad_x.iter()).map(|(a, b)| a * b).sum(),
-                        x.iter().zip(grad_y.iter()).map(|(a, b)| a * b).sum(),
-                        // x.iter().zip(grad_z.iter()).map(|(a, b)| a * b).sum(),
-                    ]
+                    grad.iter()
+                        .map(|c| x.iter().zip(c.iter()).map(|(a, b)| a * b).sum())
+                        .collect()
                 }).collect(),
         );
         out
