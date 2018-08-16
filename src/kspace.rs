@@ -14,7 +14,7 @@ use SpatialDims;
 type KSample = Vec<f64>;
 
 /// Representation of a k-space trajectory
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct KSpace {
     /// A vector of k-space samples
     pub kspace: Vec<KSample>,
