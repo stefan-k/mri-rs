@@ -53,6 +53,17 @@ impl KSpace {
         self
     }
 
+    /// Return sample at position `idx`
+    pub fn sample_at(&self, idx: usize) -> KSample {
+        self.kspace[idx].clone()
+    }
+
+    /// Set a sample at a specific position
+    pub fn set_sample(&mut self, idx: usize, sample: KSample) {
+        assert!(self.num_channels == sample.len());
+        self.kspace[idx] = sample;
+    }
+
     /// Return the number of channels
     pub fn num_channels(&self) -> usize {
         self.num_channels
