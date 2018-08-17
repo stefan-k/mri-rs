@@ -20,7 +20,9 @@ pub mod rf;
 pub mod spatialdims;
 
 pub use encodingfield::EncodingField;
+pub use kspace::KSample;
 pub use kspace::KSpace;
+pub use kspace::KSpaceThings;
 pub use localkspace::LocalKSpace;
 pub use rf::RFSensitivity;
 pub use spatialdims::SpatialDims;

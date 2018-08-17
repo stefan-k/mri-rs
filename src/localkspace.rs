@@ -9,19 +9,23 @@
 
 use EncodingField;
 use KSpace;
+use KSpaceThings;
 use SpatialDims;
 
 /// Local k-Space
-pub struct LocalKSpace<'a> {
+pub struct LocalKSpace<'a, T>
+where
+    T: KSpaceThings,
+{
     /// Actual k-Space
-    kspace: KSpace,
+    kspace: T,
     /// fields
     fields: Vec<EncodingField<'a>>,
 }
 
-impl<'a> LocalKSpace<'a> {
+impl<'a, T: KSpaceThings> LocalKSpace<'a, T> {
     /// Create new local k-space object
-    pub fn new(kspace: KSpace, fields: Vec<EncodingField<'a>>) -> Self {
+    pub fn new(kspace: T, fields: Vec<EncodingField<'a>>) -> Self {
         assert!(kspace.num_channels() == fields.len());
         LocalKSpace {
             kspace: kspace,
@@ -42,16 +46,18 @@ impl<'a> LocalKSpace<'a> {
         }
 
         let mut out = KSpace::new();
-        out.add_samples(
-            self.kspace
-                .kspace
-                .iter()
-                .map(|x| {
-                    grad.iter()
-                        .map(|c| x.iter().zip(c.iter()).map(|(a, b)| a * b).sum())
-                        .collect()
-                }).collect(),
-        );
+        let tmp: Vec<Vec<f64>> = self
+            .kspace
+            .samples()
+            .iter()
+            .map(|x| {
+                grad.iter()
+                    .map(|c| x.iter().zip(c.iter()).map(|(a, b)| a * b).sum())
+                    .collect()
+            }).collect();
+        for x in tmp {
+            out.add(x);
+        }
         out
     }
 }

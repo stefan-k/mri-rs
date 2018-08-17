@@ -11,7 +11,97 @@ use num::Integer;
 use SpatialDims;
 // use SpatialDimsIntoIterator;
 
-type KSample = Vec<f64>;
+/// A single k-space sample (one sample point in k-space)
+pub type KSample = Vec<f64>;
+/// A k-Space projection
+pub type KProjection = Vec<KSample>;
+
+/// Implement k-Space things!
+pub trait KSpaceThings {
+    /// One thing
+    type KUnit;
+
+    /// Thing 1
+    fn add(&mut self, Self::KUnit) -> &mut Self;
+    /// Thing 2
+    fn sample_at(&self, usize) -> Self::KUnit;
+    /// Thing 3
+    fn set_sample(&mut self, usize, Self::KUnit) -> &mut Self;
+    /// Thing 4
+    fn num_channels(&self) -> usize;
+    /// Thing 5
+    fn num_samples(&self) -> usize;
+    /// Thing 6
+    fn num_units(&self) -> usize;
+    /// Thing 7
+    fn samples(&self) -> Vec<KSample>;
+}
+
+/// K-space defined as a set of projections
+#[derive(Debug, Clone)]
+pub struct KSpaceProjections {
+    projections: Vec<KProjection>,
+    num_channels: usize,
+    num_samples: usize,
+    num_projections: usize,
+}
+
+impl KSpaceProjections {
+    /// Constructor
+    fn new() -> Self {
+        KSpaceProjections {
+            projections: vec![],
+            num_channels: 0,
+            num_samples: 0,
+            num_projections: 0,
+        }
+    }
+}
+
+impl KSpaceThings for KSpaceProjections {
+    type KUnit = KProjection;
+
+    fn add(&mut self, proj: KProjection) -> &mut Self {
+        let num_ch = proj[0].len();
+        if self.num_channels == 0 {
+            self.num_channels = proj[0].len();
+        }
+        assert!(num_ch == self.num_channels);
+        self.projections.push(proj);
+        self.num_projections += 1;
+        self
+    }
+
+    fn sample_at(&self, idx: usize) -> KProjection {
+        self.projections[idx].clone()
+    }
+
+    fn set_sample(&mut self, idx: usize, proj: KProjection) -> &mut Self {
+        // assert!(self.num_channels == sample.len());
+        self.projections[idx] = proj;
+        self
+    }
+
+    fn num_channels(&self) -> usize {
+        self.num_channels
+    }
+
+    fn num_samples(&self) -> usize {
+        self.num_samples
+    }
+
+    fn num_units(&self) -> usize {
+        self.num_projections
+    }
+
+    fn samples(&self) -> Vec<KSample> {
+        self.projections
+            .iter()
+            .flat_map(|arr| arr.iter())
+            .cloned()
+            .collect()
+    }
+}
 
 /// Representation of a k-space trajectory
 #[derive(Debug, Clone)]
@@ -32,50 +122,6 @@ impl KSpace {
             num_channels: 0,
             num_samples: 0,
         }
-    }
-
-    /// Add a single k-space sample point to an existing trajectory
-    pub fn add_sample(&mut self, sample: KSample) -> &mut Self {
-        if self.num_channels == 0 {
-            self.num_channels = sample.len();
-        } else if self.num_channels != sample.len() {
-            panic!("Wrong number of samples");
-        }
-
-        self.kspace.push(sample);
-        self.num_samples += 1;
-        self
-    }
-
-    /// Add several k-space sample points to an existing trajectory
-    pub fn add_samples(&mut self, samples: Vec<KSample>) -> &mut Self {
-        samples
-            .into_iter()
-            .map(|sample| {
-                self.add_sample(sample);
-            }).count();
-        self
-    }
-
-    /// Return sample at position `idx`
-    pub fn sample_at(&self, idx: usize) -> KSample {
-        self.kspace[idx].clone()
-    }
-
-    /// Set a sample at a specific position
-    pub fn set_sample(&mut self, idx: usize, sample: KSample) {
-        assert!(self.num_channels == sample.len());
-        self.kspace[idx] = sample;
-    }
-
-    /// Return the number of channels
-    pub fn num_channels(&self) -> usize {
-        self.num_channels
-    }
-
-    /// Return the number of k-space samples
-    pub fn num_samples(&self) -> usize {
-        self.num_samples
     }
 
     /// Create a Cartesian trajectory
@@ -159,5 +205,53 @@ impl KSpace {
             }
             _ => panic!("Wrong combination of things."),
         }
+    }
+}
+
+impl KSpaceThings for KSpace {
+    type KUnit = KSample;
+
+    /// Add a single k-space sample point to an existing trajectory
+    fn add(&mut self, sample: KSample) -> &mut Self {
+        if self.num_channels == 0 {
+            self.num_channels = sample.len();
+        } else if self.num_channels != sample.len() {
+            panic!("Wrong number of samples");
+        }
+
+        self.kspace.push(sample);
+        self.num_samples += 1;
+        self
+    }
+
+    /// Return sample at position `idx`
+    fn sample_at(&self, idx: usize) -> KSample {
+        self.kspace[idx].clone()
+    }
+
+    /// Set a sample at a specific position
+    fn set_sample(&mut self, idx: usize, sample: KSample) -> &mut Self {
+        assert!(self.num_channels == sample.len());
+        self.kspace[idx] = sample;
+        self
+    }
+
+    /// Return the number of channels
+    fn num_channels(&self) -> usize {
+        self.num_channels
+    }
+
+    /// Return the number of k-space samples
+    fn num_samples(&self) -> usize {
+        self.num_samples
+    }
+
+    /// Return the number of individual entities
+    fn num_units(&self) -> usize {
+        self.num_samples
+    }
+
+    fn samples(&self) -> Vec<KSample> {
+        self.kspace.clone()
     }
 }
