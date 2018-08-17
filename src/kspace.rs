@@ -20,6 +20,8 @@ pub struct KSpace {
     pub kspace: Vec<KSample>,
     /// Number of encoding channels
     num_channels: usize,
+    /// Number of samples
+    num_samples: usize,
 }
 
 impl KSpace {
@@ -28,6 +30,7 @@ impl KSpace {
         KSpace {
             kspace: vec![],
             num_channels: 0,
+            num_samples: 0,
         }
     }
 
@@ -40,6 +43,7 @@ impl KSpace {
         }
 
         self.kspace.push(sample);
+        self.num_samples += 1;
         self
     }
 
@@ -71,13 +75,14 @@ impl KSpace {
 
     /// Return the number of k-space samples
     pub fn num_samples(&self) -> usize {
-        self.kspace.len()
+        self.num_samples
     }
 
     /// Create a Cartesian trajectory
     pub fn cartesian(fov: SpatialDims<f64>, samples: SpatialDims<usize>) -> Self {
         let dk = fov.invert();
-        let mut k: Vec<KSample> = Vec::with_capacity(samples.product());
+        let num_samples = samples.product();
+        let mut k: Vec<KSample> = Vec::with_capacity(num_samples);
         match (dk, samples) {
             (SpatialDims::OneD(dkx), SpatialDims::OneD(nx)) => {
                 let nx2 = if nx.is_even() {
@@ -91,6 +96,7 @@ impl KSpace {
                 KSpace {
                     kspace: k,
                     num_channels: 1,
+                    num_samples: num_samples,
                 }
             }
             (SpatialDims::TwoD(dkx, dky), SpatialDims::TwoD(nx, ny)) => {
@@ -115,6 +121,7 @@ impl KSpace {
                 KSpace {
                     kspace: k,
                     num_channels: 2,
+                    num_samples: num_samples,
                 }
             }
             (SpatialDims::ThreeD(dkx, dky, dkz), SpatialDims::ThreeD(nx, ny, nz)) => {
@@ -147,6 +154,7 @@ impl KSpace {
                 KSpace {
                     kspace: k,
                     num_channels: 3,
+                    num_samples: num_samples,
                 }
             }
             _ => panic!("Wrong combination of things."),
