@@ -8,8 +8,8 @@
 //! k-Space
 
 use num::Integer;
+use std::f64::consts::PI;
 use SpatialDims;
-// use SpatialDimsIntoIterator;
 
 /// A single k-space sample (one sample point in k-space)
 pub type KSample = Vec<f64>;
@@ -54,6 +54,48 @@ impl KSpaceProjections {
             num_channels: 0,
             num_samples: 0,
             num_projections: 0,
+        }
+    }
+
+    /// create radial trajectory (only 2D so far)
+    pub fn radial(fov: f64, samples: usize, spokes: usize) -> Self {
+        let dk = 1. / fov;
+        let num_samples = samples * spokes;
+        let mut k: Vec<KProjection> = Vec::with_capacity(spokes);
+        // create single spoke
+        let nx2 = if samples.is_even() {
+            (samples as f64) / 2.0
+        } else {
+            (samples - 1) as f64 / 2.0
+        };
+
+        let mut spoke: Vec<KSample> = Vec::with_capacity(samples);
+        for ii in 0..samples {
+            spoke.push(vec![-nx2 * dk + (ii as f64) * dk, 0.0]);
+        }
+
+        for i in 0..spokes {
+            let theta = (i as f64) * (PI / (spokes as f64));
+            let cos_theta = theta.cos();
+            let sin_theta = theta.sin();
+            let spoke_n: Vec<KSample> = spoke
+                .iter()
+                .map(|s| {
+                    vec![
+                        s[0] * cos_theta - s[1] * sin_theta,
+                        s[0] * sin_theta + s[1] * cos_theta,
+                    ]
+                }).collect();
+            k.push(spoke_n);
+        }
+
+        // create all spokes
+
+        KSpaceProjections {
+            projections: k,
+            num_channels: 2,
+            num_samples: num_samples,
+            num_projections: spokes,
         }
     }
 }
