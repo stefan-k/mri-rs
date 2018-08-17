@@ -10,22 +10,22 @@
 use SpatialDims;
 
 /// Different kinds of encoding field derivatives
-enum EncodingFieldDerivative<'a> {
+enum EncodingFieldDerivative {
     FiniteDiff,
-    Func(&'a Fn(&SpatialDims<f64>) -> SpatialDims<f64>),
+    Func(Box<Fn(&SpatialDims<f64>) -> SpatialDims<f64>>),
 }
 
 /// This is a field that will be computed on the fly
-pub struct EncodingField<'a> {
+pub struct EncodingField {
     /// Field
-    field: &'a Fn(&SpatialDims<f64>) -> f64,
+    field: Box<Fn(&SpatialDims<f64>) -> f64>,
     /// derivative
-    derivative: EncodingFieldDerivative<'a>,
+    derivative: EncodingFieldDerivative,
 }
 
-impl<'a> EncodingField<'a> {
+impl EncodingField {
     /// Constructor
-    pub fn new(field: &'a Fn(&SpatialDims<f64>) -> f64) -> Self {
+    pub fn new(field: Box<Fn(&SpatialDims<f64>) -> f64>) -> Self {
         EncodingField {
             field,
             derivative: EncodingFieldDerivative::FiniteDiff,
@@ -35,7 +35,7 @@ impl<'a> EncodingField<'a> {
     /// Set derivative of the field
     pub fn derivative(
         &mut self,
-        derivative: &'a Fn(&SpatialDims<f64>) -> SpatialDims<f64>,
+        derivative: Box<Fn(&SpatialDims<f64>) -> SpatialDims<f64>>,
     ) -> &mut Self {
         self.derivative = EncodingFieldDerivative::Func(derivative);
         self
@@ -50,7 +50,7 @@ impl<'a> EncodingField<'a> {
     pub fn deriv_at(&self, pos: &SpatialDims<f64>) -> SpatialDims<f64> {
         match self.derivative {
             EncodingFieldDerivative::FiniteDiff => unimplemented!(),
-            EncodingFieldDerivative::Func(f) => f(pos),
+            EncodingFieldDerivative::Func(ref f) => f(pos),
         }
     }
 }

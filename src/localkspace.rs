@@ -13,19 +13,19 @@ use KSpaceThings;
 use SpatialDims;
 
 /// Local k-Space
-pub struct LocalKSpace<'a, T>
+pub struct LocalKSpace<T>
 where
     T: KSpaceThings,
 {
     /// Actual k-Space
     kspace: T,
     /// fields
-    fields: Vec<EncodingField<'a>>,
+    fields: Vec<EncodingField>,
 }
 
-impl<'a, T: KSpaceThings> LocalKSpace<'a, T> {
+impl<T: KSpaceThings> LocalKSpace<T> {
     /// Create new local k-space object
-    pub fn new(kspace: T, fields: Vec<EncodingField<'a>>) -> Self {
+    pub fn new(kspace: T, fields: Vec<EncodingField>) -> Self {
         assert!(kspace.num_channels() == fields.len());
         LocalKSpace {
             kspace: kspace,

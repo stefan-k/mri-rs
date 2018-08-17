@@ -48,7 +48,7 @@ pub struct KSpaceProjections {
 
 impl KSpaceProjections {
     /// Constructor
-    fn new() -> Self {
+    pub fn new() -> Self {
         KSpaceProjections {
             projections: vec![],
             num_channels: 0,
