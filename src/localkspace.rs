@@ -23,12 +23,12 @@ where
     fields: Vec<EncodingField>,
 }
 
-impl<T: KSpaceThings> LocalKSpace<T> {
+impl<T: KSpaceThings + Clone> LocalKSpace<T> {
     /// Create new local k-space object
-    pub fn new(kspace: T, fields: Vec<EncodingField>) -> Self {
+    pub fn new(kspace: &T, fields: Vec<EncodingField>) -> Self {
         assert!(kspace.num_channels() == fields.len());
         LocalKSpace {
-            kspace: kspace,
+            kspace: kspace.clone(),
             fields: fields,
         }
     }
