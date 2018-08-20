@@ -166,6 +166,20 @@ impl KSpace {
         }
     }
 
+    /// Create a trajectory with only zeros
+    pub fn all_zeros(samples: SpatialDims<usize>, num_channels: usize) -> Self {
+        let num_samples = samples.product();
+        let mut kspace: Vec<KSample> = Vec::with_capacity(num_samples);
+        for i in 0..num_samples {
+            kspace.push(vec![0.0; num_channels]);
+        }
+        KSpace {
+            kspace,
+            num_channels,
+            num_samples,
+        }
+    }
+
     /// Create a Cartesian trajectory
     pub fn cartesian(fov: SpatialDims<f64>, samples: SpatialDims<usize>) -> Self {
         let dk = fov.invert();
