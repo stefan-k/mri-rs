@@ -170,7 +170,7 @@ impl KSpace {
     pub fn all_zeros(samples: SpatialDims<usize>, num_channels: usize) -> Self {
         let num_samples = samples.product();
         let mut kspace: Vec<KSample> = Vec::with_capacity(num_samples);
-        for i in 0..num_samples {
+        for _ in 0..num_samples {
             kspace.push(vec![0.0; num_channels]);
         }
         KSpace {
