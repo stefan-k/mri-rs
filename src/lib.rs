@@ -22,6 +22,7 @@ pub mod spatialdims;
 pub use encodingfield::EncodingField;
 pub use kspace::KSample;
 pub use kspace::KSpace;
+pub use kspace::KSpaceParameterizedProjections;
 pub use kspace::KSpaceProjections;
 pub use kspace::KSpaceThings;
 pub use localkspace::LocalKSpace;

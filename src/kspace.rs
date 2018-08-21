@@ -311,3 +311,113 @@ impl KSpaceThings for KSpace {
         self.kspace.clone()
     }
 }
+
+/// Another way of defining a trajectory
+#[derive(Debug, Clone)]
+pub struct KSpaceParameterizedProjections {
+    positions: Vec<Vec<f64>>,
+    directions: Vec<Vec<f64>>,
+    num_channels: usize,
+    num_samples: usize,
+    num_samples_per_spoke: usize,
+    num_projections: usize,
+    dk: f64,
+}
+
+impl KSpaceParameterizedProjections {
+    /// radial only using the first two channels.
+    pub fn radial(fov: f64, num_projections: usize, num_channels: usize, samples: usize) -> Self {
+        assert!(num_channels >= 2);
+        let dk = 1. / fov;
+        let num_samples = samples * num_projections;
+        let positions = vec![vec![0.0; num_channels]; num_projections];
+        let mut directions = Vec::with_capacity(num_projections);
+        let mut init_dir = vec![0.0; num_channels];
+        init_dir[0] = 1.0;
+
+        for i in 0..num_projections {
+            let theta = (i as f64) * (PI / (num_projections as f64));
+            let cos_theta = theta.cos();
+            let sin_theta = theta.sin();
+            let mut dir = vec![0.0; num_channels];
+            dir[0] = init_dir[0] * cos_theta - init_dir[1] * sin_theta;
+            dir[1] = init_dir[0] * sin_theta + init_dir[1] * cos_theta;
+            directions.push(dir);
+        }
+
+        KSpaceParameterizedProjections {
+            positions,
+            directions,
+            num_channels,
+            num_samples,
+            num_samples_per_spoke: samples,
+            num_projections,
+            dk,
+        }
+    }
+}
+
+impl KSpaceThings for KSpaceParameterizedProjections {
+    type KUnit = (Vec<f64>, Vec<f64>);
+
+    /// Add a single k-space sample point to an existing trajectory
+    fn add(&mut self, sample: Self::KUnit) -> &mut Self {
+        self.positions.push(sample.0);
+        self.directions.push(sample.1);
+        self
+    }
+
+    /// Return sample at position `idx`
+    fn sample_at(&self, idx: usize) -> Self::KUnit {
+        (self.positions[idx].clone(), self.directions[idx].clone())
+    }
+
+    /// Set a sample at a specific position
+    fn set_sample(&mut self, idx: usize, sample: Self::KUnit) -> &mut Self {
+        self.positions[idx] = sample.0;
+        self.directions[idx] = sample.1;
+        self
+    }
+
+    /// Return the number of channels
+    fn num_channels(&self) -> usize {
+        self.num_channels
+    }
+
+    /// Return the number of k-space samples
+    fn num_samples(&self) -> usize {
+        self.num_samples
+    }
+
+    /// Return the number of individual entities
+    fn num_units(&self) -> usize {
+        self.num_projections
+    }
+
+    fn samples(&self) -> Vec<KSample> {
+        // very crude... maybe try again. it should be possible to make this more efficient
+        let mut out = Vec::with_capacity(self.num_samples);
+
+        let nx2 = if self.num_samples_per_spoke.is_even() {
+            (self.num_samples_per_spoke / 2) as i64
+        } else {
+            ((self.num_samples_per_spoke - 1) / 2) as i64
+        };
+
+        let mut thing = Vec::with_capacity(self.num_samples_per_spoke);
+        for ii in 0..self.num_samples_per_spoke {
+            thing.push(-nx2 + ii as i64);
+        }
+
+        for s in 0..self.num_projections {
+            for i in 0..self.num_samples_per_spoke {
+                let mut sample = Vec::with_capacity(self.num_channels);
+                for d in 0..self.num_channels {
+                    sample.push(self.positions[s][d] + (thing[i] as f64) * self.directions[s][d]);
+                }
+                out.push(sample);
+            }
+        }
+        out
+    }
+}
