@@ -71,7 +71,10 @@ impl KSpaceProjections {
 
         let mut spoke: Vec<KSample> = Vec::with_capacity(samples);
         for ii in 0..samples {
-            spoke.push(vec![-nx2 * dk + (ii as f64) * dk, 0.0]);
+            // Im removing the center point! careful!!!!
+            if (nx2 as usize) != ii {
+                spoke.push(vec![-nx2 * dk + (ii as f64) * dk, 0.0]);
+            }
         }
 
         for i in 0..spokes {
@@ -322,6 +325,8 @@ pub struct KSpaceParameterizedProjections {
     num_samples_per_spoke: usize,
     num_projections: usize,
     dk: f64,
+    limits: Vec<f64>,
+    spoke_ind: Vec<i64>,
 }
 
 impl KSpaceParameterizedProjections {
@@ -329,6 +334,7 @@ impl KSpaceParameterizedProjections {
     pub fn radial(fov: f64, num_projections: usize, num_channels: usize, samples: usize) -> Self {
         assert!(num_channels >= 2);
         let dk = 1. / fov;
+        let num_samples_per_spoke = samples;
         let num_samples = samples * num_projections;
         let positions = vec![vec![0.0; num_channels]; num_projections];
         let mut directions = Vec::with_capacity(num_projections);
@@ -345,6 +351,17 @@ impl KSpaceParameterizedProjections {
             directions.push(dir);
         }
 
+        let nx2 = if num_samples_per_spoke.is_even() {
+            (num_samples_per_spoke / 2) as i64
+        } else {
+            ((num_samples_per_spoke - 1) / 2) as i64
+        };
+
+        let mut thing = Vec::with_capacity(num_samples_per_spoke);
+        for ii in 0..num_samples_per_spoke {
+            thing.push(-nx2 + ii as i64);
+        }
+
         KSpaceParameterizedProjections {
             positions,
             directions,
@@ -353,7 +370,21 @@ impl KSpaceParameterizedProjections {
             num_samples_per_spoke: samples,
             num_projections,
             dk,
+            limits: vec![-165.0, 165.0],
+            spoke_ind: thing,
         }
+    }
+
+    fn calc_projection(&self, pos: &Vec<f64>, dir: &Vec<f64>) -> Vec<KSample> {
+        let mut out = Vec::with_capacity(self.num_samples_per_spoke);
+        for i in 0..self.num_samples_per_spoke {
+            let mut sample = Vec::with_capacity(self.num_channels);
+            for d in 0..self.num_channels {
+                sample.push(pos[d] + (self.spoke_ind[i] as f64) * dir[d] * self.dk);
+            }
+            out.push(sample);
+        }
+        out
     }
 }
 
@@ -374,8 +405,16 @@ impl KSpaceThings for KSpaceParameterizedProjections {
 
     /// Set a sample at a specific position
     fn set_sample(&mut self, idx: usize, sample: Self::KUnit) -> &mut Self {
-        self.positions[idx] = sample.0;
-        self.directions[idx] = sample.1;
+        let spoke = self.calc_projection(&sample.0, &sample.1);
+        let inside: bool = spoke
+            .iter()
+            .flat_map(|arr| arr.iter())
+            .map(|&x| x < self.limits[1] && x > self.limits[0])
+            .fold(true, |arr, x| arr && x);
+        if inside {
+            self.positions[idx] = sample.0;
+            self.directions[idx] = sample.1;
+        }
         self
     }
 
@@ -398,22 +437,14 @@ impl KSpaceThings for KSpaceParameterizedProjections {
         // very crude... maybe try again. it should be possible to make this more efficient
         let mut out = Vec::with_capacity(self.num_samples);
 
-        let nx2 = if self.num_samples_per_spoke.is_even() {
-            (self.num_samples_per_spoke / 2) as i64
-        } else {
-            ((self.num_samples_per_spoke - 1) / 2) as i64
-        };
-
-        let mut thing = Vec::with_capacity(self.num_samples_per_spoke);
-        for ii in 0..self.num_samples_per_spoke {
-            thing.push(-nx2 + ii as i64);
-        }
-
         for s in 0..self.num_projections {
             for i in 0..self.num_samples_per_spoke {
                 let mut sample = Vec::with_capacity(self.num_channels);
                 for d in 0..self.num_channels {
-                    sample.push(self.positions[s][d] + (thing[i] as f64) * self.directions[s][d]);
+                    sample.push(
+                        self.positions[s][d]
+                            + (self.spoke_ind[i] as f64) * self.directions[s][d] * self.dk,
+                    );
                 }
                 out.push(sample);
             }
