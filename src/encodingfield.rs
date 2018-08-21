@@ -7,27 +7,30 @@
 
 //! Encoding fields
 
+use std::rc::Rc;
 use SpatialDims;
 
 /// Different kinds of encoding field derivatives
+#[derive(Clone)]
 enum EncodingFieldDerivative {
     FiniteDiff,
-    Func(Box<Fn(&SpatialDims<f64>) -> SpatialDims<f64>>),
+    Func(Rc<Fn(&SpatialDims<f64>) -> SpatialDims<f64>>),
 }
 
 /// This is a field that will be computed on the fly
+#[derive(Clone)]
 pub struct EncodingField {
     /// Field
-    field: Box<Fn(&SpatialDims<f64>) -> f64>,
+    field: Rc<Fn(&SpatialDims<f64>) -> f64>,
     /// derivative
     derivative: EncodingFieldDerivative,
 }
 
 impl EncodingField {
     /// Constructor
-    pub fn new(field: Box<Fn(&SpatialDims<f64>) -> f64>) -> Self {
+    pub fn new(field: Rc<Fn(&SpatialDims<f64>) -> f64>) -> Self {
         EncodingField {
-            field,
+            field: field.clone(),
             derivative: EncodingFieldDerivative::FiniteDiff,
         }
     }
@@ -35,9 +38,9 @@ impl EncodingField {
     /// Set derivative of the field
     pub fn derivative(
         &mut self,
-        derivative: Box<Fn(&SpatialDims<f64>) -> SpatialDims<f64>>,
+        derivative: Rc<Fn(&SpatialDims<f64>) -> SpatialDims<f64>>,
     ) -> &mut Self {
-        self.derivative = EncodingFieldDerivative::Func(derivative);
+        self.derivative = EncodingFieldDerivative::Func(derivative.clone());
         self
     }
 
