@@ -38,7 +38,7 @@ pub trait KSpaceThings {
 }
 
 /// K-space defined as a set of projections
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct KSpaceProjections {
     projections: Vec<KProjection>,
     num_channels: usize,
@@ -149,7 +149,7 @@ impl KSpaceThings for KSpaceProjections {
 }
 
 /// Representation of a k-space trajectory
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct KSpace {
     /// A vector of k-space samples
     pub kspace: Vec<KSample>,
@@ -316,7 +316,7 @@ impl KSpaceThings for KSpace {
 }
 
 /// Another way of defining a trajectory
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct KSpaceParameterizedProjections {
     positions: Vec<Vec<f64>>,
     directions: Vec<Vec<f64>>,
